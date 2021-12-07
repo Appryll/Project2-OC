@@ -22,14 +22,18 @@ soup = BeautifulSoup(page, "html.parser")
 soup_ppal_prod = BeautifulSoup(page_ppal_prod, "html.parser")
 
 # recuperation du product page URL
+tout_url_prod = soup_ppal_prod.find("a", {"title": "Sapiens: A Brief History of Humankind"})['href']
+print(tout_url_prod)
+
+"""""
 tout_url_prod = soup_ppal_prod.find_all("a")
 url_prod_dic = []
 for ch_url_prod in tout_url_prod:
     url_prod_dic.append(ch_url_prod.string)
-    # print(ch_url_prod.get('href'))
-# print(url_prod_dic)
-url_prod = url_prod_dic[54]
-
+    print(ch_url_prod.get('href'))
+print(url_prod_dic)
+# url_prod = url_prod_dic[54]
+"""
 
 # recuperation UPC
 tout_td = soup.find_all("td")
@@ -81,7 +85,7 @@ print(review_rating)
 images = soup.findAll('img')[1]
 url_img = images['src']
 print(url_img)
-
+""""
 # création du fichier data.csv
 en_tete = [
     'product_page_url',
@@ -109,3 +113,4 @@ with open('data.csv', 'w') as fichier_csv:
                                                                        review_rating, url_img):
         writer.writerows([product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
                          number_available, product_description, category, review_rating, image_url])
+"""""
