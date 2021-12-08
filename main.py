@@ -46,7 +46,6 @@ print(upc)
 # recuperation du titres
 titre = soup.find("h1")
 titre_book = titre.string
-
 print(titre_book)
 
 # récupération du price including tax
@@ -85,7 +84,7 @@ print(review_rating)
 images = soup.findAll('img')[1]
 url_img = images['src']
 print(url_img)
-""""
+
 # création du fichier data.csv
 en_tete = [
     'product_page_url',
@@ -102,15 +101,7 @@ en_tete = [
 with open('data.csv', 'w') as fichier_csv:
     # permet d'ecrire dans csv
     writer = csv.writer(fichier_csv, delimiter=',')
-    # écrir la premiere line
+    # écrire la premiere line
     writer.writerow(en_tete)
-
-    # zip permet d'itérer sur deux listes à la fois
-
-    for product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax, number_available, \
-        product_description, category, review_rating, image_url in zip(url_prod, upc, titre_book, price_tax,
-                                                                       price_s_tax, number_available, description_text,
-                                                                       review_rating, url_img):
-        writer.writerows([product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
-                         number_available, product_description, category, review_rating, image_url])
-"""""
+    writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
+                     review_rating, url_img])
