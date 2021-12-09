@@ -4,25 +4,28 @@ import csv
 
 # lien de la page à scrapper
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
-url_ppal_prod = "http://books.toscrape.com/catalogue/category/books/history_32/index.html"
+url_cat_histoy = "http://books.toscrape.com/catalogue/category/books/history_32/index.html"
+url_cat_mystery="http://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
 
 # recuperate le content de la page
 reponse = requests.get(url)
-reponse_ppal_prod = requests.get(url_ppal_prod)
+reponse_cat_history = requests.get(url_cat_histoy)
+reponse_cat_mystery = requests.get(url_cat_mystery)
 
 # accede au content de la page
 page = reponse.content
-page_ppal_prod = reponse_ppal_prod.content
-
+page_cat_history = reponse_cat_history.content
+page_cat_mistery = reponse_cat_mystery.content
 # affiche la page HTML
 # print(page)
 
 # transforme (parse) le HTML en objet BeautifulSoup (fail a lire)
 soup = BeautifulSoup(page, "html.parser")
-soup_ppal_prod = BeautifulSoup(page_ppal_prod, "html.parser")
+soup_cat_history = BeautifulSoup(page_cat_history, "html.parser")
+
 
 # recuperation du product page URL
-tout_url_prod = soup_ppal_prod.find("a", {"title": "Sapiens: A Brief History of Humankind"})['href']
+tout_url_prod = soup_cat_history.find("a", {"title": "Sapiens: A Brief History of Humankind"})['href']
 print(tout_url_prod)
 
 """""
