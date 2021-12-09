@@ -5,23 +5,29 @@ import csv
 # lien de la page à scrapper
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
 url_cat_histoy = "http://books.toscrape.com/catalogue/category/books/history_32/index.html"
-url_cat_mystery="http://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
+url_home = "http://books.toscrape.com/index.html"
+url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
 
 # recuperate le content de la page
 reponse = requests.get(url)
 reponse_cat_history = requests.get(url_cat_histoy)
+reponse_home = requests.get(url_home)
 reponse_cat_mystery = requests.get(url_cat_mystery)
 
 # accede au content de la page
 page = reponse.content
 page_cat_history = reponse_cat_history.content
-page_cat_mistery = reponse_cat_mystery.content
+page_home = reponse_home.content
+page_cat_mystery = reponse_cat_mystery.content
+
 # affiche la page HTML
 # print(page)
 
 # transforme (parse) le HTML en objet BeautifulSoup (fail a lire)
 soup = BeautifulSoup(page, "html.parser")
 soup_cat_history = BeautifulSoup(page_cat_history, "html.parser")
+soup_home = BeautifulSoup(page_home, "html.parser")
+soup_cat_mystery = BeautifulSoup(page_cat_mystery, "html.parser")
 
 
 # recuperation du product page URL
@@ -87,6 +93,23 @@ print(review_rating)
 images = soup.findAll('img')[1]
 url_img = images['src']
 print(url_img)
+
+"""
+douxieme partie
+"""
+
+# URL de la categorie choisi
+url_mystery = soup_home.findAll('a')[4]['href']
+print(url_mystery)
+
+# URL de chaque livre de la categorie choisi
+div_container = soup_cat_mystery.findAll(class_='image_container')
+# print(div_container)
+urls_mystery = []
+for a in div_container:
+    urls_a_mystery = a.find('a')['href']
+    urls_mystery.append(urls_a_mystery)
+print(urls_mystery)
 
 # création du fichier data.csv
 en_tete = [
