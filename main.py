@@ -6,7 +6,7 @@ import csv
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
 url_cat_histoy = "http://books.toscrape.com/catalogue/category/books/history_32/index.html"
 url_home = "http://books.toscrape.com/index.html"
-url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
+url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/page-1.html"
 
 # recuperate le content de la page
 reponse = requests.get(url)
@@ -80,10 +80,12 @@ print(description_text)
 
 # récupération du category
 categories = soup.find_all("a")
-category_book = []
+category_list_book = []
 for category in categories:
-    category_book.append(category.string)
-print(category_book[3])
+    category_list_book.append(category.string)
+# print(category_list_book[3])
+category_book = category_list_book[3]
+print(category_book)
 
 # récupération du review rating
 review_rating = universal_product_code[6]
@@ -130,4 +132,4 @@ with open('data.csv', 'w') as fichier_csv:
     # écrire la premiere line
     writer.writerow(en_tete)
     writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
-                     review_rating, url_img])
+                     category_book, review_rating, url_img])
