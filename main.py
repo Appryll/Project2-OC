@@ -6,19 +6,16 @@ import csv
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
 url_cat_histoy = "http://books.toscrape.com/catalogue/category/books/history_32/index.html"
 url_home = "http://books.toscrape.com/index.html"
-url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/page-1.html"
 
 # recuperate le content de la page
 reponse = requests.get(url)
 reponse_cat_history = requests.get(url_cat_histoy)
 reponse_home = requests.get(url_home)
-reponse_cat_mystery = requests.get(url_cat_mystery)
 
 # accede au content de la page
 page = reponse.content
 page_cat_history = reponse_cat_history.content
 page_home = reponse_home.content
-page_cat_mystery = reponse_cat_mystery.content
 
 # affiche la page HTML
 # print(page)
@@ -27,8 +24,6 @@ page_cat_mystery = reponse_cat_mystery.content
 soup = BeautifulSoup(page, "html.parser")
 soup_cat_history = BeautifulSoup(page_cat_history, "html.parser")
 soup_home = BeautifulSoup(page_home, "html.parser")
-soup_cat_mystery = BeautifulSoup(page_cat_mystery, "html.parser")
-
 
 # recuperation du product page URL
 tout_url_prod = soup_cat_history.find("a", {"title": "Sapiens: A Brief History of Humankind"})['href']
@@ -105,12 +100,21 @@ url_mystery = soup_home.findAll('a')[4]['href']
 print(url_mystery)
 
 # URL de chaque livre de la categorie choisi
-div_container = soup_cat_mystery.findAll(class_='image_container')
-# print(div_container)
 urls_mystery = []
-for a in div_container:
-    urls_a_mystery = a.find('a')['href']
-    urls_mystery.append(urls_a_mystery)
+for i in range(3):
+    url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/page-" + str(i) + ".html"
+    # recuperate le content de la page
+    reponse_cat_mystery = requests.get(url_cat_mystery)
+    if reponse_cat_mystery.ok:
+        # accede au content de la page
+        page_cat_mystery = reponse_cat_mystery.content
+        # transform (parse) le HTML en objet BeautifulSoup (fail a lire)
+        soup_cat_mystery = BeautifulSoup(page_cat_mystery, "html.parser")
+        div_container = soup_cat_mystery.findAll(class_='image_container')
+# print(div_container)
+        for a in div_container:
+            urls_a_mystery = a.find('a')['href']
+            urls_mystery.append(urls_a_mystery)
 print(urls_mystery)
 
 # création du fichier data.csv
