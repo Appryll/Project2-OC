@@ -109,6 +109,7 @@ url_mystery = soup_home.findAll('a')[4]['href']
 # URL de chaque livre de la categorie choisi
 urls_mystery = []
 
+
 """ var de la premiere maniere de le faire
 titres_cat_mystery = []
 urls_img_cat_mystery = []
@@ -133,8 +134,9 @@ for i in range(3):
             urls_a_mystery = a.find('a')
             urls_href_mystery = urls_a_mystery['href']
             urls_mystery.append('http://books.toscrape.com/catalogue' + urls_href_mystery[8:])
+# print(urls_mystery)
 
-# douxieme maniere: utilisant les URL de toutes les livres=> boucle for + code de la premier partie
+# deuxième maniere: utilisant les URL de toutes les livres=> boucle for + code de la premier partie
 
 for ch_book in urls_mystery:
     # recuperate le content de la page
@@ -196,6 +198,35 @@ for ch_book in urls_mystery:
         # print(url_img_ch_book_mystery)
 
         # création du fichier data.csv
+        file = open('data.csv', 'w', newline='')
+        with file:
+            header = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax',
+                      'price_excluding_tax', 'number_available', 'product_description',  'category',  'review_rating',
+                      'image_url']
+            writer = csv.DictWriter(file, fieldnames=header)
+
+            writer.writeheader()
+            writer.writerow({'product_page_url': tout_url_prod,
+                             'universal_product_code(upc)': upc,
+                             'title': titre_book,
+                             'price_including_tax': price_tax,
+                             'price_excluding_tax': price_s_tax,
+                             'number_available': number_available,
+                             'product_description': description_text,
+                             'category': category_book,
+                             'review_rating': review_rating,
+                            'image_url': url_img})
+            writer.writerow({'product_page_url': urls_mystery,
+                             'universal_product_code(upc)': upc_ch_book_mystery,
+                             'title': titre_ch_book_mystery,
+                             'price_including_tax': price_tax_ch_book_mystery,
+                             'price_excluding_tax': price_s_tax_ch_book_mystery,
+                             'number_available': number_available_ch_book_mystery,
+                             'product_description': description_ch_book_mystery,
+                             'category': category_ch_book_mystery,
+                             'review_rating': review_rating_ch_book_mystery,
+                            'image_url': url_img_ch_book_mystery})
+"""
         en_tete = [
             'product_page_url',
             'universal_product_code(upc)',
@@ -207,27 +238,18 @@ for ch_book in urls_mystery:
             'category',
             'review_rating',
             'image_url']
-
+            
         with open('data.csv', 'w') as fichier_csv:
-
             # permet d'ecrire dans csv
             writer = csv.writer(fichier_csv, delimiter=',')
             # écrire la premiere line
             writer.writerow(en_tete)
             writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
                              category_book, review_rating, url_img])
-            mystery = [urls_mystery,
-                       upc_ch_book_mystery,
-                       titre_ch_book_mystery,
-                       price_tax_ch_book_mystery,
-                       price_s_tax_ch_book_mystery,
-                       number_available_ch_book_mystery,
-                       description_ch_book_mystery,
-                       category_ch_book_mystery,
-                       review_rating_ch_book_mystery,
-                       img_ch_book_mystery]
-            for items in mystery:
-                writer.writerow(items)
+            writer.writerow([urls_mystery, upc_ch_book_mystery, titre_ch_book_mystery, price_tax_ch_book_mystery,
+                             price_s_tax_ch_book_mystery, number_available_ch_book_mystery, description_ch_book_mystery,
+                             category_ch_book_mystery, review_rating_ch_book_mystery, url_img_ch_book_mystery])
+"""
 
 """ premier maniere de faire l'exercice : utilisant la page de la categorie Mystery
         # title toutes les livres de la categorie choisie
