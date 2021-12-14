@@ -211,11 +211,6 @@ a_categories = []
 for ul in uls_categories:
     ul_categories = uls_categories.find('ul')
     # print(ul_categories)
-    for li in ul_categories:
-        li_categories = ul_categories.find_all('a')
-        a_categories.append(li_categories)
-print(a_categories)
-
 # pagination
 urls_tous_books = []
 for i in range(51):
