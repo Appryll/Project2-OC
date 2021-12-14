@@ -83,7 +83,7 @@ url_img = 'http://books.toscrape.com/' + images[6:]
 # print(url_img)
 
 """
-douxieme partie las url de cada libro en lista y despues for paracada una y la respuesta pasa por cada una
+Douxiéme partie=> las url de cada libro en lista y despues for paracada una y la respuesta pasa por cada una
 """
 # URL de la categorie choisie
 url_mystery = 'http://books.toscrape.com/catalogue/category' + soup_home.findAll('a')[4]['href'][2:]
@@ -92,13 +92,6 @@ url_mystery = 'http://books.toscrape.com/catalogue/category' + soup_home.findAll
 # URL de chaque livre de la categorie choisie
 urls_mystery = []
 
-""" var de la premiere maniere de le faire
-titres_cat_mystery = []
-urls_img_cat_mystery = []
-price_cat_mystery = []
-status_cat_mystery = []
-img_cat_mystery = []
-"""
 # pagination
 for i in range(3):
     url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/page-" + str(i) + ".html"
@@ -208,99 +201,21 @@ for ch_book in urls_mystery:
                 writer.writerow([url, upc, titre, prix_tax, prix_s_tax, number_av, description, category, rating,
                                  url_img])
 """
-        # création du fichier data.csv
-        file = open('data.csv', 'w', newline='')
-        with file:
-            header = ['product_page_url', 'universal_product_code(upc)', 'title', 'price_including_tax',
-                      'price_excluding_tax', 'number_available', 'product_description',  'category',  'review_rating',
-                      'image_url']
-            writer = csv.DictWriter(file, fieldnames=header)
-
-            writer.writeheader()
-            writer.writerow({'product_page_url': tout_url_prod,
-                             'universal_product_code(upc)': upc,
-                             'title': titre_book,
-                             'price_including_tax': price_tax,
-                             'price_excluding_tax': price_s_tax,
-                             'number_available': number_available,
-                             'product_description': description_text,
-                             'category': category_book,
-                             'review_rating': review_rating,
-                            'image_url': url_img})
-            for url, upc, titre, prix_tax, prix_s_tax, number_av, description, category, rating, url_img in zip(
-                    urls_mystery, upc_ch_book_mystery, titre_ch_book_mystery, price_tax_ch_book_mystery,
-                    price_s_tax_ch_book_mystery, number_available_ch_book_mystery, description_ch_book_mystery,
-                    category_ch_book_mystery, review_rating_ch_book_mystery, url_img_ch_book_mystery):
-                # Créer une nouvelle ligne avec le titre et la description à ce moment de la boucle
-                writer.writerow({'product_page_url': {url},
-                                 'universal_product_code(upc)': {upc},
-                                 'title': {titre},
-                                 'price_including_tax': {price_tax},
-                                 'price_excluding_tax': {price_s_tax},
-                                 'number_available': {number_av},
-                                 'product_description': {description},
-                                 'category': {category},
-                                 'review_rating': {rating},
-                                 'image_url': {url_img}})
-
-                data1 = list(zip(urls_mystery, upc_ch_book_mystery, titre_ch_book_mystery, price_tax_ch_book_mystery,
-                                 price_s_tax_ch_book_mystery, number_available_ch_book_mystery,
-                                 description_ch_book_mystery, category_ch_book_mystery, review_rating_ch_book_mystery,
-                                 url_img_ch_book_mystery))
-                print(data1)
+Troisième partie=> extrait les informations produit de tous les livres appartenant à toutes les différentes catégories
 """
+# URL toutes categories
+href_categories = []
+uls_categories = soup_home.find('ul', class_='nav nav-list')
+# print(uls_categories)
+a_categories = []
+for ul in uls_categories:
+    ul_categories = uls_categories.find('ul')
+    # print(ul_categories)
+    for li in ul_categories:
+        li_categories = ul_categories.find_all('a')
+        a_categories.append(li_categories)
+print(a_categories)
 
-"""
-mystery = [urls_mystery,
-           titres_cat_mystery,
-           price_cat_mystery,
-           status_cat_mystery,
-           img_cat_mystery,
-           ]
-with open('data.csv', 'w') as fichier_csv:
-    # permet d'ecrire dans csv
-    writer = csv.writer(fichier_csv, delimiter=',')
-    # écrire la premiere line
-    writer.writerow(en_tete)
-    writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
-                     category_book, review_rating, url_img])
-    # writer.writerow(['URL categorie', 'Titre livre', 'Prix', 'Status', 'URL image'])
-"""
-
-""" premier maniere de faire l'exercice : utilisant la page de la categorie Mystery
-        # title toutes les livres de la categorie choisie
-        titres_h3 = soup_cat_mystery.findAll('h3')
-        for h3 in titres_h3:
-            titres_h3_mystery = h3.find('a')['title']
-            titres_cat_mystery.append(titres_h3_mystery)
-
-        # price toutes les livres de la categorie choisie
-        price_mystery = soup_cat_mystery.find_all('p', class_='price_color')
-        for prices in price_mystery:
-            price_cat_mystery.append(prices.string)
-
-        # status toutes les livres de la categorie choisie
-        status = soup_cat_mystery.find_all('p', class_='instock availability')
-        for stat in status:
-            status_cat_mystery.append(stat.text[15:23])
-
-        # img toutes les livres de la categorie choisie
-        images = soup_cat_mystery.find_all('img')
-        for img in images:
-            img_cat_mystery.append('http://books.toscrape.com/' + img['src'][10:])
-
-print(img_cat_mystery)
-print(urls_mystery)
-print(status_cat_mystery)
-print(img_cat_mystery)
-print(status_cat_mystery)
-print(price_cat_mystery)
-print(titres_cat_mystery)
-
-"""
-"""
-troisieme partie
-"""
 # pagination
 urls_tous_books = []
 for i in range(51):
@@ -378,7 +293,6 @@ for chs_books in urls_tous_books:
         # print(category_chs_books)
 
         # récupération de l'image URL
-
         div_chs_books = soup_chs_books.find('div', class_='item active')
         for img in div_chs_books:
             img_chs_books = div_chs_books.find('img')['src']
@@ -387,41 +301,5 @@ for chs_books in urls_tous_books:
             # print((links_img_chs_books))
 
 """
-# URL toutes les categories
-div = soup_home.find_all(class_='side_categories')
-# print(div)
-
-links_categories = []
-for a in div:
-    as_books = a.find_all('a')[1:]
-    links_categories.append(as_books)
-    print(links_categories)
-as_books = []
-uls = soup_home.find_all('ul', class_='nav-list')
-for ul in uls:
-    uls_books = ul.find('ul')
-    # print(uls_books)
-    for a in uls_books:
-        a_books = a.find('a')['href']
-        as_books.append(a_books)
-        print(as_books)
-
-
-
-télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
-
-from urllib import request
-# Define the remote file to retrieve
-remote_url = ‘'
-# Define the local filename to save data
-local_file = ‘ ’
-# Download remote and save locally
-request.urlretrieve(remote_url, local_file)
-
-
-import urllib
-resource = urllib.urlopen("http://www.digimouth.com/news/media/2011/09/google-logo.jpg")
-output = open("file01.jpg","wb")
-output.write(resource.read())
-output.close()
+Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
 """
