@@ -319,8 +319,8 @@ for i in range(51):
             urls_a_tous_books = a.find('a')
             urls_href_tous_books = urls_a_tous_books['href']
             urls_tous_books.append('http://books.toscrape.com/catalogue/' + urls_href_tous_books[6:])
-print(len(urls_tous_books))
-print(urls_tous_books)
+# print(len(urls_tous_books))
+# print(urls_tous_books)
 
 for chs_books in urls_tous_books:
     # recuperate le content de la page
@@ -378,9 +378,13 @@ for chs_books in urls_tous_books:
         # print(category_chs_books)
 
         # récupération de l'image URL
-        # img_chs_books = soup_chs_books.findAll('img')[1]['src']
-        # url_img_chs_books = 'http://books.toscrape.com/' + img_chs_books[6:]
-        # print(url_img_chs_books)
+
+        div_chs_books = soup_chs_books.find('div', class_='item active')
+        for img in div_chs_books:
+            img_chs_books = div_chs_books.find('img')['src']
+            # print(img_chs_books)
+            links_img_chs_books = 'https://books.toscrape.com/' + img_chs_books[6:]
+            # print((links_img_chs_books))
 
 """
 # URL toutes les categories
