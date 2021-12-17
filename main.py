@@ -82,41 +82,61 @@ images = soup.findAll('img')[1]['src']
 url_img = 'http://books.toscrape.com/' + images[6:]
 # print(url_img)
 
+# création du fichier Books to Scrape(1livre+1categorie).csv
+
+en_tete = [
+    'product_page_url',
+    'universal_product_code(upc)',
+    'title',
+    'price_including_tax',
+    'price_excluding_tax',
+    'number_available',
+    'product_description',
+    'category',
+    'review_rating',
+    'image_url']
+
+with open('Books to Scrape(1livre+1categorie).csv', 'w') as fichier_csv:
+    # permet d'ecrire dans csv
+    writer = csv.writer(fichier_csv, delimiter=',')
+    # écrire la premiere line
+    writer.writerow(en_tete)
+    writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
+                     category_book, review_rating, url_img])
+
 """
 Douxiéme partie=> las url de cada libro en lista y despues for paracada una y la respuesta pasa por cada una
 """
+
 # URL de la categorie choisie
 url_mystery = 'http://books.toscrape.com/catalogue/category' + soup_home.findAll('a')[4]['href'][2:]
 # print(url_mystery)
-
-# URL de chaque livre de la categorie choisie
-urls_mystery = []
 
 # pagination
 for i in range(3):
     url_cat_mystery = "http://books.toscrape.com/catalogue/category/books/mystery_3/page-" + str(i) + ".html"
     # recuperate le content de la page
     reponse_cat_mystery = requests.get(url_cat_mystery)
-    if reponse_cat_mystery.ok:
-        # accede au content de la page
-        page_cat_mystery = reponse_cat_mystery.content
-        # transform (parse) le HTML en objet BeautifulSoup (fail a lire)
-        soup_cat_mystery = BeautifulSoup(page_cat_mystery, "html.parser")
+    # accede au content de la page
+    page_cat_mystery = reponse_cat_mystery.content
+    # transform (parse) le HTML en objet BeautifulSoup (fail a lire)
+    soup_cat_mystery = BeautifulSoup(page_cat_mystery, "html.parser")
 
-        # URL toutes les livres de la categorie choisie
-        div_container = soup_cat_mystery.findAll(class_='image_container')
-        for a in div_container:
-            urls_a_mystery = a.find('a')
-            urls_href_mystery = urls_a_mystery['href']
-            urls_mystery.append('http://books.toscrape.com/catalogue' + urls_href_mystery[8:])
-# print(urls_mystery)
+    # URL de chaque livre de la categorie choisie
+    urls_mystery = []
+    div_container = soup_cat_mystery.find_all(class_='image_container')
+    for a in div_container:
+        urls_a_mystery = a.find('a')
+        # print(urls_a_mystery)
+        urls_href_mystery = urls_a_mystery['href']
+        # print(urls_href_mystery)
+        urls_mystery.append('http://books.toscrape.com/catalogue' + urls_href_mystery[8:])
+    # print(urls_mystery)
 
-# deuxième maniere: utilisant les URL de toutes les livres=> boucle for + code de la premier partie
-
-for ch_book in urls_mystery:
-    # recuperate le content de la page
-    reponse_ch_page_mystery = requests.get(ch_book)
-    if reponse_ch_page_mystery.ok:
+    # deuxième maniere: utilisant les URL de toutes les livres=> boucle for + code de la premier partie
+    for ch_book in urls_mystery:
+        # recuperate le content de la page
+        reponse_ch_page_mystery = requests.get(ch_book)
         # accede au content de la page
         page_ch_page_mystery = reponse_ch_page_mystery.content
         # transform (parse) le HTML en objet BeautifulSoup (fail a lire)
@@ -124,31 +144,34 @@ for ch_book in urls_mystery:
 
         # recuperation UPC
         tout_td_ch_page_mystery = soup_ch_page_mystery.find_all("td")
-        td_ch_page_mystery = []
-        for cod_prod_ch_page_mystery in tout_td_ch_page_mystery:
-            td_ch_page_mystery.append(cod_prod_ch_page_mystery.string)
-        upc_ch_book_mystery = td_ch_page_mystery[0]
+        # print(tout_td_ch_page_mystery)
+        upc_ch_book_mystery = []
+        for upc in tout_td_ch_page_mystery[0]:
+            upc_ch_book_mystery.append(upc.string)
         # print(upc_ch_book_mystery)
 
         # recuperation du titres
         h1_ch_page_mystery = soup_ch_page_mystery.find("h1")
-        titre_ch_book_mystery = h1_ch_page_mystery.string
+        # print(h1_ch_page_mystery.text)
+        titre_ch_book_mystery = []
+        for titre in h1_ch_page_mystery:
+            titre_ch_book_mystery.append(titre)
         # print(titre_ch_book_mystery)
 
         # récupération du price including tax
-        price_tax_ch_book_mystery = td_ch_page_mystery[2]
+        price_tax_ch_book_mystery = tout_td_ch_page_mystery[2].text
         # print(price_tax_ch_book_mystery)
 
         # récupération du price excluding tax
-        price_s_tax_ch_book_mystery = td_ch_page_mystery[3]
+        price_s_tax_ch_book_mystery = tout_td_ch_page_mystery[3].text
         # print(price_s_tax_ch_book_mystery)
 
         # récupération du number available
-        number_available_ch_book_mystery = td_ch_page_mystery[5]
+        number_available_ch_book_mystery = tout_td_ch_page_mystery[5].text
         # print(number_available_ch_book_mystery)
 
         # récupération du review rating
-        review_rating_ch_book_mystery = td_ch_page_mystery[6]
+        review_rating_ch_book_mystery = tout_td_ch_page_mystery[6].text
         # print(review_rating_ch_book_mystery)
 
         # récupération de la description
@@ -172,45 +195,36 @@ for ch_book in urls_mystery:
         url_img_ch_book_mystery = 'http://books.toscrape.com/' + img_ch_book_mystery[6:]
         # print(url_img_ch_book_mystery)
 
-        # création du fichier data.csv
-
-        en_tete = [
-            'product_page_url',
-            'universal_product_code(upc)',
-            'title',
-            'price_including_tax',
-            'price_excluding_tax',
-            'number_available',
-            'product_description',
-            'category',
-            'review_rating',
-            'image_url']
-
-        with open('data.csv', 'w') as fichier_csv:
+        # création du fichier Books to Scrape(1livre+1categorie).csv
+        with open('Books to Scrape(1livre+1categorie).csv', 'a') as fichier_csv:
             # permet d'ecrire dans csv
             writer = csv.writer(fichier_csv, delimiter=',')
-            # écrire la premiere line
-            writer.writerow(en_tete)
-            writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
-                             category_book, review_rating, url_img])
-            for url, upc, titre, prix_tax, prix_s_tax, number_av, description, category, rating, url_img in zip(
-                    urls_mystery, upc_ch_book_mystery, titre_ch_book_mystery, price_tax_ch_book_mystery,
-                    price_s_tax_ch_book_mystery, number_available_ch_book_mystery, description_ch_book_mystery,
-                    category_ch_book_mystery, review_rating_ch_book_mystery, url_img_ch_book_mystery):
-                # Créer une nouvelle ligne avec le titre et la description à ce moment de la boucle
-                writer.writerow([url, upc, titre, prix_tax, prix_s_tax, number_av, description, category, rating,
-                                 url_img])
+            writer.writerow([ch_book, upc, titre, price_tax_ch_book_mystery, price_s_tax_ch_book_mystery,
+                             number_available_ch_book_mystery, review_rating_ch_book_mystery,
+                             description_ch_book_mystery, category_ch_book_mystery, url_img_ch_book_mystery])
+
 """
 Troisième partie=> extrait les informations produit de tous les livres appartenant à toutes les différentes catégories
+
+as_categories = soup_home.find('a')
+href_categories = as_categories['href']
+text_categories = as_categories.text
+print(text_categories)
 """
 # URL toutes categories
-href_categories = []
-uls_categories = soup_home.find('ul', class_='nav nav-list')
-# print(uls_categories)
-a_categories = []
-for ul in uls_categories:
-    ul_categories = uls_categories.find('ul')
-    # print(ul_categories)
+
+ul_categories = soup_home.find('ul')
+# print(ul_categories)
+for a in ul_categories:
+    a_categories = a.find('a')
+    # print(a_categories)
+
+div_categories = soup_home.find(class_='side_categories')
+# print(div_categories)
+for a in div_categories:
+    categories.append(div_categories)
+    # print(a.text[9:])
+
 # pagination
 urls_tous_books = []
 for i in range(51):
