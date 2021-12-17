@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
+import pandas as pd
 
 # lien de la page à scrapper
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
@@ -96,7 +97,7 @@ en_tete = [
     'review_rating',
     'image_url']
 
-with open('Books to Scrape(1livre+1categorie).csv', 'w') as fichier_csv:
+with open('Books to Scrape(1livre+1categorie).csv', 'w', newline='', encoding='utf-8') as fichier_csv:
     # permet d'ecrire dans csv
     writer = csv.writer(fichier_csv, delimiter=',')
     # écrire la premiere line
@@ -196,7 +197,7 @@ for i in range(3):
         # print(url_img_ch_book_mystery)
 
         # création du fichier Books to Scrape(1livre+1categorie).csv
-        with open('Books to Scrape(1livre+1categorie).csv', 'a') as fichier_csv:
+        with open('Books to Scrape(1livre+1categorie).csv', 'a', newline='', encoding='utf-8') as fichier_csv:
             # permet d'ecrire dans csv
             writer = csv.writer(fichier_csv, delimiter=',')
             writer.writerow([ch_book, upc, titre, price_tax_ch_book_mystery, price_s_tax_ch_book_mystery,
@@ -308,6 +309,11 @@ for chs_books in urls_tous_books:
             # print(img_chs_books)
             links_img_chs_books = 'https://books.toscrape.com/' + img_chs_books[6:]
             # print((links_img_chs_books))
+
+dp = pd.DataFrame(columns=['product_page_url', 'universal_product_code(upc)', 'price_including_tax',
+                           'price_excluding_tax', 'number_available', 'product_description', 'category',
+                           'review_rating', 'image_url'])
+print(dp)
 
 """
 Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
