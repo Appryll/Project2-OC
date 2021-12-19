@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
-import pandas as pd
+# import pandas as pd
 
 # lien de la page à scrapper
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
@@ -207,25 +207,17 @@ for i in range(3):
 """
 Troisième partie=> extrait les informations produit de tous les livres appartenant à toutes les différentes catégories
 
-as_categories = soup_home.find('a')
-href_categories = as_categories['href']
-text_categories = as_categories.text
-print(text_categories)
 """
-# URL toutes categories
+# text categories
 
-ul_categories = soup_home.find('ul')
-# print(ul_categories)
-"""
-for a in ul_categories:
-    a_categories = a.find('a')
-    # print(a_categories)
-"""
 div_categories = soup_home.find(class_='side_categories')
 # print(div_categories)
+categories = []
 for e in div_categories:
     categories.append(div_categories)
-    # print(a.text[9:])
+    # print(categories)
+    category_text = e.text[9:]
+    # print(category_text)
 
 # pagination
 urls_tous_books = []
@@ -308,20 +300,33 @@ for chs_books in urls_tous_books:
         url_img_chs_book = 'http://books.toscrape.com/' + img_chs_book[6:]
         # print(url_img_chs_book)
 
-        with open('Books to Scrape.csv', 'a', newline='', encoding='utf-8') as fichier_csv:
-            # permet d'ecrire dans csv
-            writer = csv.writer(fichier_csv, delimiter=',')
-            # écrire la premiere line
-            writer.writerow([chs_books, upc_chs_books, price_tax_chs_books, price_s_tax_chs_books,
-                             number_available_chs_books, review_rating_chs_books, description_chs_books,
-                             category_chs_books, url_img_chs_book])
+        with open("Books to Scrape.csv", "a", encoding='utf-8', newline="") as f:
+            k = csv.writer(f, delimiter=',')
+            with open("Books to Scrape.csv", "r", encoding='utf-8', newline="") as fs:
+                reader = csv.reader(fs)
+                if not [row for row in reader]:
+                    k.writerow(en_tete)
+                    k.writerow([chs_books, upc_chs_books, price_tax_chs_books, price_s_tax_chs_books,
+                                number_available_chs_books, review_rating_chs_books, description_chs_books,
+                                category_chs_books, url_img_chs_book])
+                else:
+                    k.writerow([chs_books, upc_chs_books, price_tax_chs_books, price_s_tax_chs_books,
+                                number_available_chs_books, review_rating_chs_books, description_chs_books,
+                                category_chs_books, url_img_chs_book])
+
 """
 data = pd.read_csv('Books to Scrape.csv')
-print(data)
+# print(data)
 
 is_mystery_boolean = data["category"] == "Mystery"
 is_mystery = data[is_mystery_boolean]
-print(is_mystery)
+# print(is_mystery)
+
+with open("is_mystery.csv", mode='w', newline='\n') as f:
+    is_mystery.to_csv(f, sep=",", line_terminator='\n', encoding='utf-8')
+
+mystery_csv = is_mystery.to_csv('is_mystery.csv', index=False)
+print(mystery_csv)
 """
 """
 Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
