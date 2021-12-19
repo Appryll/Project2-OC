@@ -216,13 +216,14 @@ print(text_categories)
 
 ul_categories = soup_home.find('ul')
 # print(ul_categories)
+"""
 for a in ul_categories:
     a_categories = a.find('a')
     # print(a_categories)
-
+"""
 div_categories = soup_home.find(class_='side_categories')
 # print(div_categories)
-for a in div_categories:
+for e in div_categories:
     categories.append(div_categories)
     # print(a.text[9:])
 
@@ -240,8 +241,8 @@ for i in range(51):
 
         # URL tous books
         div_cont_tous_books = soup_tous_books.findAll(class_='image_container')
-        for a in div_cont_tous_books:
-            urls_a_tous_books = a.find('a')
+        for urls in div_cont_tous_books:
+            urls_a_tous_books = urls.find('a')
             urls_href_tous_books = urls_a_tous_books['href']
             urls_tous_books.append('http://books.toscrape.com/catalogue/' + urls_href_tous_books[6:])
 # print(len(urls_tous_books))
@@ -271,19 +272,19 @@ for chs_books in urls_tous_books:
         # print(titre_ch_book_mystery)
 
         # récupération du price including tax
-        price_tax_chs_books = td_chs_books[2]
+        price_tax_chs_books = td_chs_books[2].text
         # print(price_tax_chs_books)
 
         # récupération du price excluding tax
-        price_s_tax_chs_books = td_chs_books[3]
+        price_s_tax_chs_books = td_chs_books[3].text
         # print(price_s_tax_chs_books)
 
         # récupération du number available
-        number_available_chs_books = td_chs_books[5]
+        number_available_chs_books = td_chs_books[5].text
         # print(number_available_chs_books)
 
         # récupération du review rating
-        review_rating_chs_books = td_chs_books[6]
+        review_rating_chs_books = td_chs_books[6].text
         # print(review_rating_chs_books)
 
         # récupération de la description
@@ -303,18 +304,25 @@ for chs_books in urls_tous_books:
         # print(category_chs_books)
 
         # récupération de l'image URL
-        div_chs_books = soup_chs_books.find('div', class_='item active')
-        for img in div_chs_books:
-            img_chs_books = div_chs_books.find('img')['src']
-            # print(img_chs_books)
-            links_img_chs_books = 'https://books.toscrape.com/' + img_chs_books[6:]
-            # print((links_img_chs_books))
+        img_chs_book = soup_chs_books.find('img')['src']
+        url_img_chs_book = 'http://books.toscrape.com/' + img_chs_book[6:]
+        # print(url_img_chs_book)
 
-dp = pd.DataFrame(columns=['product_page_url', 'universal_product_code(upc)', 'price_including_tax',
-                           'price_excluding_tax', 'number_available', 'product_description', 'category',
-                           'review_rating', 'image_url'])
-print(dp)
+        with open('Books to Scrape.csv', 'a', newline='', encoding='utf-8') as fichier_csv:
+            # permet d'ecrire dans csv
+            writer = csv.writer(fichier_csv, delimiter=',')
+            # écrire la premiere line
+            writer.writerow([chs_books, upc_chs_books, price_tax_chs_books, price_s_tax_chs_books,
+                             number_available_chs_books, review_rating_chs_books, description_chs_books,
+                             category_chs_books, url_img_chs_book])
+"""
+data = pd.read_csv('Books to Scrape.csv')
+print(data)
 
+is_mystery_boolean = data["category"] == "Mystery"
+is_mystery = data[is_mystery_boolean]
+print(is_mystery)
+"""
 """
 Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
 """
