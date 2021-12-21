@@ -1,7 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 import csv
-# import pandas as pd
+import pandas as pd
+import os
+# from urllib.parse import urlparse
+# from urllib import request
 
 # lien de la page à scrapper
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
@@ -98,12 +101,15 @@ en_tete = [
     'image_url']
 
 with open('Books to Scrape(1livre+1categorie).csv', 'w', newline='', encoding='utf-8') as fichier_csv:
+    print('Téléchargement du livre choisie...')
     # permet d'ecrire dans csv
     writer = csv.writer(fichier_csv, delimiter=',')
     # écrire la premiere line
     writer.writerow(en_tete)
     writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
                      category_book, review_rating, url_img])
+    print('Téléchargement terminé')
+    print('Téléchargement de la catégorie choisie...')
 
 """
 Douxiéme partie=> las url de cada libro en lista y despues for paracada una y la respuesta pasa por cada una
@@ -203,23 +209,20 @@ for i in range(3):
             writer.writerow([ch_book, upc, titre, price_tax_ch_book_mystery, price_s_tax_ch_book_mystery,
                              number_available_ch_book_mystery, review_rating_ch_book_mystery,
                              description_ch_book_mystery, category_ch_book_mystery, url_img_ch_book_mystery])
+print('Téléchargement terminé : Books to Scrape(1livre+1categorie).csv')
 
 """
 Troisième partie=> extrait les informations produit de tous les livres appartenant à toutes les différentes catégories
-
 """
-# text categories
+# Text categories
+ul_categories = soup_home.find('ul', class_='nav nav-list')
+# print(ul_categories)
+categorie_text = []
+for a_categories in ul_categories:
+    categorie_text = a_categories.text.split()
+    # print(categorie_text)
 
-div_categories = soup_home.find(class_='side_categories')
-# print(div_categories)
-categories = []
-for e in div_categories:
-    categories.append(div_categories)
-    # print(categories)
-    category_text = e.text[9:]
-    # print(category_text)
-
-# pagination
+# Pagination
 urls_tous_books = []
 for i in range(51):
     url_tous_books = "http://books.toscrape.com/catalogue/category/books_1/page-" + str(i) + ".html"
@@ -296,8 +299,10 @@ for chs_books in urls_tous_books:
         # print(category_chs_books)
 
         # récupération de l'image URL
-        img_chs_book = soup_chs_books.find('img')['src']
-        url_img_chs_book = 'http://books.toscrape.com/' + img_chs_book[6:]
+        img_chs_book = soup_chs_books.find('img')
+        src_img_chs_book = img_chs_book['src']
+        name_img_chs_book = img_chs_book['alt']
+        url_img_chs_book = 'http://books.toscrape.com/' + src_img_chs_book[6:]
         # print(url_img_chs_book)
 
         with open("Books to Scrape.csv", "a", encoding='utf-8', newline="") as f:
@@ -306,28 +311,66 @@ for chs_books in urls_tous_books:
                 reader = csv.reader(fs)
                 if not [row for row in reader]:
                     k.writerow(en_tete)
-                    k.writerow([chs_books, upc_chs_books, price_tax_chs_books, price_s_tax_chs_books,
-                                number_available_chs_books, review_rating_chs_books, description_chs_books,
-                                category_chs_books, url_img_chs_book])
+                    k.writerow([chs_books, upc_chs_books, titre_ch_book_mystery, price_tax_chs_books,
+                                price_s_tax_chs_books, number_available_chs_books, description_chs_books,
+                                category_chs_books, review_rating_chs_books, url_img_chs_book])
+                elif len([row for row in reader]) <= 1001:
+                    k.writerow([chs_books, upc_chs_books, titre_ch_book_mystery, price_tax_chs_books,
+                                price_s_tax_chs_books, number_available_chs_books, description_chs_books,
+                                category_chs_books, review_rating_chs_books, url_img_chs_book])
                 else:
-                    k.writerow([chs_books, upc_chs_books, price_tax_chs_books, price_s_tax_chs_books,
-                                number_available_chs_books, review_rating_chs_books, description_chs_books,
-                                category_chs_books, url_img_chs_book])
+                    pass
 
-"""
+# Pandas select category
+# read csv
 data = pd.read_csv('Books to Scrape.csv')
 # print(data)
-
+"""
+for c in categorie_text:
+    is_cat_boolean = data["category"] == c
+    is_cat = data[is_cat_boolean]
+    print(is_cat)
+    mystery_csv = is_cat.to_csv('is_' + c + '.csv', index=False)
+"""
+# select Mystery
 is_mystery_boolean = data["category"] == "Mystery"
 is_mystery = data[is_mystery_boolean]
-# print(is_mystery)
-
-with open("is_mystery.csv", mode='w', newline='\n') as f:
-    is_mystery.to_csv(f, sep=",", line_terminator='\n', encoding='utf-8')
-
 mystery_csv = is_mystery.to_csv('is_mystery.csv', index=False)
-print(mystery_csv)
-"""
+
+
+# select Travel
+is_mystery_boolean = data["category"] == "Travel"
+is_mystery = data[is_mystery_boolean]
+travel_csv = is_mystery.to_csv('is_mystery.csv', index=False)
+
+# Books', 'Travel', 'Mystery', 'Historical', 'Fiction', 'Sequential', 'Art', 'Classics', 'Philosophy', 'Romance',
+# 'Womens', 'Fiction', 'Fiction', 'Childrens', 'Religion', 'Nonfiction', 'Music', 'Default', 'Science', 'Fiction',
+# 'Sports', 'and', 'Games', 'Add', 'a', 'comment', 'Fantasy', 'New', 'Adult', 'Young', 'Adult', 'Science', 'Poetry',
+# 'Paranormal', 'Art', 'Psychology', 'Autobiography', 'Parenting', 'Adult', 'Fiction', 'Humor', 'Horror', 'History',
+# 'Food', 'and', 'Drink', 'Christian', 'Fiction', 'Business', 'Biography', 'Thriller', 'Contemporary', 'Spirituality',
+# 'Academic', 'Self', 'Help', 'Historical', 'Christian', 'Suspense', 'Short', 'Stories', 'Novels', 'Health', 'Politics',
+# 'Cultural', 'Erotica', 'Crime'
+
 """
 Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
 """
+SAVE_FOLDERS = 'images'
+url = input('Quelle page Produit SVP?')
+
+
+def imagedown(url):
+    if not os.path.exists(SAVE_FOLDERS):
+        os.mkdir(SAVE_FOLDERS)
+
+    r = requests.get(url)
+    soup_dow = BeautifulSoup(r.content, 'html.parser')
+    images_dow = soup_dow.find('img')
+    name = images_dow['alt']
+    link = 'http://books.toscrape.com/' + images_dow['src']
+    with open('images/' + name + '.jpg', 'wb') as fichier:
+        im = requests.get(link)
+        fichier.write(im.content)
+        print('Writing: ', name)
+
+
+imagedown(url)
