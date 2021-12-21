@@ -3,26 +3,21 @@ from bs4 import BeautifulSoup
 import csv
 import pandas as pd
 import os
-# from urllib.parse import urlparse
-# from urllib import request
 
-# lien de la page à scrapper
+# lien de las pages à scrapper
 url = "http://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
 url_cat_histoy = "http://books.toscrape.com/catalogue/category/books/history_32/index.html"
 url_home = "http://books.toscrape.com/catalogue/category/books_1/index.html"
 
-# recuperate le content de la page
+# recuperate le content de las pages
 reponse = requests.get(url)
 reponse_cat_history = requests.get(url_cat_histoy)
 reponse_home = requests.get(url_home)
 
-# accede au content de la page
+# accede au content de las pages
 page = reponse.content
 page_cat_history = reponse_cat_history.content
 page_home = reponse_home.content
-
-# affiche la page HTML
-# print(page)
 
 # transforme (parse) le HTML en objet BeautifulSoup (fail a lire)
 soup = BeautifulSoup(page, "html.parser")
@@ -33,8 +28,6 @@ soup_home = BeautifulSoup(page_home, "html.parser")
 tout_url_prod = 'http://books.toscrape.com/catalogue' + soup_cat_history.find("a", {"title": "Sapiens: A Brief History"
                                                                                              " of Humankind"}
                                                                               )['href'][8:]
-# print(tout_url_prod)
-
 # recuperation UPC
 tout_td = soup.find_all("td")
 universal_product_code = []
@@ -43,7 +36,7 @@ for code_product in tout_td:
 upc = universal_product_code[0]
 # print(upc)
 
-# recuperation du titres
+# recuperation de titre
 titre = soup.find("h1")
 titre_book = titre.string
 # print(titre_book)
@@ -73,7 +66,6 @@ categories = soup.find_all("a")
 category_list_book = []
 for category in categories:
     category_list_book.append(category.string)
-# print(category_list_book[3])
 category_book = category_list_book[3]
 # print(category_book)
 
@@ -87,7 +79,6 @@ url_img = 'http://books.toscrape.com/' + images[6:]
 # print(url_img)
 
 # création du fichier Books to Scrape(1livre+1catégorie).csv
-
 en_tete = [
     'product_page_url',
     'universal_product_code(upc)',
@@ -100,9 +91,10 @@ en_tete = [
     'review_rating',
     'image_url']
 
+# création du dossier Téléchargements
 if not os.path.exists('Téléchargements'):
     os.mkdir('Téléchargements')
-
+# écrire fichier
 with open('Téléchargements/Books to Scrape(1livre+1catégorie).csv', 'w', newline='', encoding='utf-8') as fichier_csv:
     print('Téléchargement des informations du livre choisie...')
     # permet d'ecrire dans csv
@@ -115,9 +107,8 @@ with open('Téléchargements/Books to Scrape(1livre+1catégorie).csv', 'w', newl
     print('Téléchargement des informations des livres de la catégorie choisie...')
 
 """
-Douxiéme partie=> las url de cada libro en lista y despues for paracada una y la respuesta pasa por cada una
+Douxiéme partie=> catéfgorie choisie
 """
-
 # URL de la catégorie choisie
 url_mystery = 'http://books.toscrape.com/catalogue/category' + soup_home.findAll('a')[4]['href'][2:]
 # print(url_mystery)
@@ -143,7 +134,7 @@ for i in range(3):
         urls_mystery.append('http://books.toscrape.com/catalogue' + urls_href_mystery[8:])
     # print(urls_mystery)
 
-    # deuxième maniere: utilisant les URL de toutes les livres=> boucle for + code de la premier partie
+    # utilisant les URL de toutes les livres=> boucle for + code de la première partie
     for ch_book in urls_mystery:
         # recuperate le content de la page
         reponse_ch_page_mystery = requests.get(ch_book)
@@ -213,7 +204,7 @@ for i in range(3):
             writer.writerow([ch_book, upc, titre, price_tax_ch_book_mystery, price_s_tax_ch_book_mystery,
                              number_available_ch_book_mystery, review_rating_ch_book_mystery,
                              description_ch_book_mystery, category_ch_book_mystery, url_img_ch_book_mystery])
-print('Téléchargement terminé : Books to Scrape(1livre+1catégorie).csv')
+print('Téléchargement terminé : Téléchargements/Books to Scrape(1livre+1catégorie).csv')
 print('Téléchargement des informations des livres des différents catégories')
 
 """
@@ -245,7 +236,6 @@ for i in range(51):
             urls_a_tous_books = urls.find('a')
             urls_href_tous_books = urls_a_tous_books['href']
             urls_tous_books.append('http://books.toscrape.com/catalogue/' + urls_href_tous_books[6:])
-# print(len(urls_tous_books))
 # print(urls_tous_books)
 
 for chs_books in urls_tous_books:
@@ -255,7 +245,6 @@ for chs_books in urls_tous_books:
         # accede au content de la page
         page_chs_books = reponse_chs_books.content
         # transform (parse) le HTML en objet BeautifulSoup (fail a lire)
-        # print(reponse_chs_books)
         soup_chs_books = BeautifulSoup(page_chs_books, "html.parser")
 
         # recuperation UPC
@@ -310,6 +299,7 @@ for chs_books in urls_tous_books:
         url_img_chs_book = 'http://books.toscrape.com/' + src_img_chs_book[6:]
         # print(url_img_chs_book)
 
+        # création du fichier Books to Scrape.csv
         with open("Books to Scrape.csv", "a", encoding='utf-8', newline="") as f:
             k = csv.writer(f, delimiter=',')
             with open("Books to Scrape.csv", "r", encoding='utf-8', newline="") as fs:
@@ -339,6 +329,7 @@ cat_text = ['Travel', 'Mystery', 'Historical Fiction', 'Sequential Art', 'Classi
             'Thriller', 'Contemporary', 'Spirituality', 'Academic', 'Self Help', 'Historical', 'Christian', 'Suspense',
             'Short Stories', 'Novels', 'Health', 'Politics', 'Cultural', 'Erotica', 'Crime']
 
+# création du dossier Info livres par catégorie
 if not os.path.exists('Info livres par catégorie'):
     os.mkdir('Téléchargements/Info livres par catégorie')
 
@@ -348,7 +339,7 @@ for c in cat_text:
     is_cat = data[is_cat_boolean]
     # print(is_cat)
     mystery_csv = is_cat.to_csv('Téléchargements/Info livres par catégorie/is_' + c + '.csv', index=False)
-    print('Téléchargement terminé')
+    print('Téléchargement terminé: Téléchargements/Info livres par catégorie/ ... .csv')
 
 """
 Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
@@ -370,7 +361,7 @@ def imagedown(url):
         im = requests.get(link)
         fichier.write(im.content)
         print('Téléchargement', name)
-        print('Téléchargement terminé')
+        print('Téléchargement terminé: Téléchargements/Images/', name, '.jpg')
 
 
 imagedown(url)
