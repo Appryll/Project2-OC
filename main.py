@@ -24,6 +24,9 @@ soup = BeautifulSoup(page, "html.parser")
 soup_cat_history = BeautifulSoup(page_cat_history, "html.parser")
 soup_home = BeautifulSoup(page_home, "html.parser")
 
+"""
+Extraire des informations d'un livre
+"""
 # recuperation du product page URL
 tout_url_prod = 'http://books.toscrape.com/catalogue' + soup_cat_history.find("a", {"title": "Sapiens: A Brief History"
                                                                                              " of Humankind"}
@@ -92,11 +95,13 @@ en_tete = [
     'image_url']
 
 # création du dossier Téléchargements
-if not os.path.exists('Téléchargements'):
-    os.mkdir('Téléchargements')
+dir_tel = 'Téléchargements'
+if not os.path.exists(dir_tel):
+    os.mkdir(dir_tel)
+
 # écrire fichier
-with open('Téléchargements/Books to Scrape(1livre+1catégorie).csv', 'w', newline='', encoding='utf-8') as fichier_csv:
-    print('Téléchargement des informations du livre choisie...')
+with open(dir_tel + '/Books to Scrape(1livre+1catégorie).csv', 'w', newline='', encoding='utf-8') as fichier_csv:
+    print('Téléchargement en cours des informations du livre choisie...')
     # permet d'ecrire dans csv
     writer = csv.writer(fichier_csv, delimiter=',')
     # écrire la premiere line
@@ -104,10 +109,10 @@ with open('Téléchargements/Books to Scrape(1livre+1catégorie).csv', 'w', newl
     writer.writerow([tout_url_prod, upc, titre_book, price_tax, price_s_tax, number_available, description_text,
                      category_book, review_rating, url_img])
     print('Téléchargement terminé')
-    print('Téléchargement des informations des livres de la catégorie choisie...')
+    print('Téléchargement en cours des informations des livres de la catégorie choisie...')
 
 """
-Douxiéme partie=> catéfgorie choisie
+Extraire les informations de tous les livres de la catégorie choisie : Mystery
 """
 # URL de la catégorie choisie
 url_mystery = 'http://books.toscrape.com/catalogue/category' + soup_home.findAll('a')[4]['href'][2:]
@@ -134,7 +139,7 @@ for i in range(3):
         urls_mystery.append('http://books.toscrape.com/catalogue' + urls_href_mystery[8:])
     # print(urls_mystery)
 
-    # utilisant les URL de toutes les livres=> boucle for + code de la première partie
+    # utilisant les URL de tous les livres=> boucle for + code de la première partie
     for ch_book in urls_mystery:
         # recuperate le content de la page
         reponse_ch_page_mystery = requests.get(ch_book)
@@ -197,7 +202,7 @@ for i in range(3):
         # print(url_img_ch_book_mystery)
 
         # création du fichier Books to Scrape(1livre+1catégorie).csv
-        with open('Téléchargements/Books to Scrape(1livre+1catégorie).csv', 'a', newline='', encoding='utf-8') as \
+        with open(dir_tel + '/Books to Scrape(1livre+1catégorie).csv', 'a', newline='', encoding='utf-8') as \
                 fichier_csv:
             # permet d'ecrire dans csv
             writer = csv.writer(fichier_csv, delimiter=',')
@@ -205,18 +210,12 @@ for i in range(3):
                              number_available_ch_book_mystery, review_rating_ch_book_mystery,
                              description_ch_book_mystery, category_ch_book_mystery, url_img_ch_book_mystery])
 print('Téléchargement terminé : Téléchargements/Books to Scrape(1livre+1catégorie).csv')
-print('Téléchargement des informations des livres des différents catégories')
+print('Téléchargement en cours de toutes les images des livres')
 
-"""
-Troisième partie=> extrait les informations produit de tous les livres appartenant à toutes les différentes catégories
-"""
-# Text catégories
-ul_categories = soup_home.find('ul', class_='nav nav-list')
-# print(ul_categories)
-categorie_text = []
-for a_categories in ul_categories:
-    categorie_text = a_categories.text.split()
-    # print(categorie_text)
+# création du dossier Images
+dir_images = 'Images'
+if not os.path.exists(dir_images):
+    os.mkdir(dir_tel + '/' + dir_images)
 
 # Pagination
 urls_tous_books = []
@@ -236,8 +235,36 @@ for i in range(51):
             urls_a_tous_books = urls.find('a')
             urls_href_tous_books = urls_a_tous_books['href']
             urls_tous_books.append('http://books.toscrape.com/catalogue/' + urls_href_tous_books[6:])
-# print(urls_tous_books)
+        # print(urls_tous_books)
 
+        """
+        Télécharger et enregistrer le fichier image de chaque page Produit
+        """
+        # URL toutes images
+        links_images = soup_tous_books.find_all("img")
+        # print(links_images)
+        for link in links_images:
+            links_img = 'http://books.toscrape.com/' + link['src'][9:]
+            name_img = link['src'][-36:]
+            print(name_img)
+            with open(dir_tel + '/' + dir_images + '/' + name_img, 'wb') as fichier:
+                im = requests.get(links_img)
+                fichier.write(im.content)
+print('Téléchargement des images terminé: Téléchargements/Images/...')
+print('Téléchargement en cours des informations des livres des différents catégories')
+
+"""
+Extraire les informations produit de tous les livres appartenant aux différentes catégories
+"""
+# Text catégories
+ul_categories = soup_home.find('ul', class_='nav nav-list')
+# print(ul_categories)
+categorie_text = []
+for a_categories in ul_categories:
+    categorie_text = a_categories.text.split()
+    # print(categorie_text)
+
+# utilisant les URL de tous les livres=> boucle for + code de la première partie
 for chs_books in urls_tous_books:
     # recuperate le content de la page
     reponse_chs_books = requests.get(chs_books)
@@ -294,9 +321,9 @@ for chs_books in urls_tous_books:
 
         # récupération de l'image URL
         img_chs_book = soup_chs_books.find('img')
-        src_img_chs_book = img_chs_book['src']
         name_img_chs_book = img_chs_book['alt']
-        url_img_chs_book = 'http://books.toscrape.com/' + src_img_chs_book[6:]
+        # print(name_img_chs_book)
+        url_img_chs_book = 'http://books.toscrape.com/' + img_chs_book['src'][6:]
         # print(url_img_chs_book)
 
         # création du fichier Books to Scrape.csv
@@ -309,12 +336,10 @@ for chs_books in urls_tous_books:
                     k.writerow([chs_books, upc_chs_books, titre_ch_book_mystery, price_tax_chs_books,
                                 price_s_tax_chs_books, number_available_chs_books, description_chs_books,
                                 category_chs_books, review_rating_chs_books, url_img_chs_book])
-                elif len([row for row in reader]) <= 1001:
+                else:
                     k.writerow([chs_books, upc_chs_books, titre_ch_book_mystery, price_tax_chs_books,
                                 price_s_tax_chs_books, number_available_chs_books, description_chs_books,
                                 category_chs_books, review_rating_chs_books, url_img_chs_book])
-                else:
-                    pass
 
 # écriture des données dans un fichier CSV distinct pour chaque catégorie de livres
 # Pandas select category
@@ -324,44 +349,20 @@ data = pd.read_csv('Books to Scrape.csv')
 cat_text = ['Travel', 'Mystery', 'Historical Fiction', 'Sequential Art', 'Classics', 'Philosophy', 'Romance',
             'Womens Fiction', 'Fiction', 'Childrens', 'Religion', 'Nonfiction', 'Music', 'Default', 'Science Fiction',
             'Sports and Games', 'Add a comment', 'Fantasy', 'New Adult', 'Young Adult', 'Science', 'Poetry',
-            'Paranormal', 'Art', 'Psychology', 'Autobiography', 'Parenting', 'Adult', 'Fiction', 'Humor', 'Horror',
-            'History', 'Food and Drink', 'Christian Fiction', 'Business', 'Biography',
-            'Thriller', 'Contemporary', 'Spirituality', 'Academic', 'Self Help', 'Historical', 'Christian', 'Suspense',
-            'Short Stories', 'Novels', 'Health', 'Politics', 'Cultural', 'Erotica', 'Crime']
+            'Paranormal', 'Art', 'Psychology', 'Autobiography', 'Parenting', 'Adult Fiction', 'Humor', 'Horror',
+            'History', 'Food and Drink', 'Christian Fiction', 'Business', 'Biography', 'Thriller', 'Contemporary',
+            'Spirituality', 'Academic', 'Self Help', 'Historical', 'Christian', 'Suspense', 'Short Stories', 'Novels',
+            'Health', 'Politics', 'Cultural', 'Erotica', 'Crime']
 
 # création du dossier Info livres par catégorie
-if not os.path.exists('Info livres par catégorie'):
-    os.mkdir('Téléchargements/Info livres par catégorie')
+dir_info = 'Info livres par catégorie'
+if not os.path.exists(dir_info):
+    os.mkdir(dir_tel + '/' + dir_info)
 
 for c in cat_text:
     print('...' + c)
     is_cat_boolean = data["category"] == c
     is_cat = data[is_cat_boolean]
     # print(is_cat)
-    mystery_csv = is_cat.to_csv('Téléchargements/Info livres par catégorie/is_' + c + '.csv', index=False)
-    print('Téléchargement terminé: Téléchargements/Info livres par catégorie/ ... .csv')
-
-"""
-Quatrième partie=> télécharger et enregistrer le fichier image de chaque page Produit que vous consultez
-"""
-
-url = input('Quelle page Produit SVP?')
-
-
-def imagedown(url):
-    if not os.path.exists('Images'):
-        os.mkdir('Téléchargements/Images')
-
-    r = requests.get(url)
-    soup_dow = BeautifulSoup(r.content, 'html.parser')
-    images_dow = soup_dow.find('img')
-    name = images_dow['alt']
-    link = 'http://books.toscrape.com/' + images_dow['src']
-    with open('Téléchargements/Images/' + name + '.jpg', 'wb') as fichier:
-        im = requests.get(link)
-        fichier.write(im.content)
-        print('Téléchargement', name)
-        print('Téléchargement terminé: Téléchargements/Images/', name, '.jpg')
-
-
-imagedown(url)
+    mystery_csv = is_cat.to_csv(dir_tel + '/' + dir_info + '/' + c + '.csv', index=False)
+    print('Téléchargement terminé: Téléchargements/Info livres par catégorie/', c, '.csv')
